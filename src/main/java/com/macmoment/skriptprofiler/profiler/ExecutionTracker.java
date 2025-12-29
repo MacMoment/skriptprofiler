@@ -117,25 +117,31 @@ public class ExecutionTracker implements Listener {
     
     /**
      * Generic event handler to track event executions
-     * This provides basic tracking for all events
+     * This provides basic tracking for all events.
+     * 
+     * IMPORTANT LIMITATION: This handler cannot measure actual Skript event processing time.
+     * As a MONITOR priority handler, it runs after all other handlers have completed.
+     * To measure actual Skript execution time, integration with Skript's internal trigger
+     * system would be required. This implementation tracks:
+     * - Event occurrence count (useful for identifying high-frequency events)
+     * - Minimal profiler overhead timing (not the actual event processing time)
+     * 
+     * The script file analysis (via ScriptFileLoader) provides the main profiling data.
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void onEvent(Event event) {
         if (!isTracking) return;
         
-        // Track event execution - simplified version
-        // In production, this would integrate with Skript's internal event handling
         String eventType = event.getClass().getSimpleName();
-        long startTime = System.nanoTime();
         
-        // Record event execution after a tick to measure processing time
-        // Real implementation would hook into Skript's trigger execution
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            long duration = System.nanoTime() - startTime;
-            // Record the event execution with basic tracking
-            ProfileData data = createOrGetProfileData("events", 0, "event", eventType);
-            data.recordExecution(duration);
-        }, 1L);
+        // Record the event occurrence - this tracks event frequency
+        // The timing recorded is the profiler's own overhead, not actual event processing
+        long startTime = System.nanoTime();
+        ProfileData data = createOrGetProfileData("events", 0, "event", eventType);
+        long endTime = System.nanoTime();
+        
+        // Record profiler overhead timing for this event occurrence
+        data.recordExecution(endTime - startTime);
     }
     
     /**
