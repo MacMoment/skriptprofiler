@@ -30,15 +30,30 @@ public class ProfileData {
         executionCount.incrementAndGet();
         totalExecutionTime.addAndGet(executionTimeNanos);
         
-        // Update min/max
-        synchronized (this) {
-            if (executionTimeNanos > maxExecutionTime) {
-                maxExecutionTime = executionTimeNanos;
-            }
-            if (executionTimeNanos < minExecutionTime) {
-                minExecutionTime = executionTimeNanos;
+        // Update min/max only for non-zero times
+        if (executionTimeNanos > 0) {
+            synchronized (this) {
+                if (executionTimeNanos > maxExecutionTime) {
+                    maxExecutionTime = executionTimeNanos;
+                }
+                if (executionTimeNanos < minExecutionTime) {
+                    minExecutionTime = executionTimeNanos;
+                }
             }
         }
+    }
+    
+    /**
+     * Increments the execution count without recording timing data.
+     * Useful for tracking event occurrences where timing cannot be measured.
+     * 
+     * Note: Using this method will affect average execution time calculations.
+     * The average time will be lower since execution count increases without
+     * corresponding time. This is intentional for event occurrence counting
+     * where timing data is not meaningful.
+     */
+    public void incrementExecutionCount() {
+        executionCount.incrementAndGet();
     }
     
     public long getExecutionCount() {
@@ -49,10 +64,16 @@ public class ProfileData {
         return totalExecutionTime.get();
     }
     
+    /**
+     * Returns the average execution time in milliseconds.
+     * Note: If incrementExecutionCount() was used, this may return artificially
+     * low values since those executions don't contribute to total time.
+     */
     public double getAverageExecutionTimeMs() {
         long count = executionCount.get();
-        if (count == 0) return 0;
-        return (totalExecutionTime.get() / (double) count) / 1_000_000.0;
+        long totalTime = totalExecutionTime.get();
+        if (count == 0 || totalTime == 0) return 0;
+        return (totalTime / (double) count) / 1_000_000.0;
     }
     
     public double getMaxExecutionTimeMs() {
