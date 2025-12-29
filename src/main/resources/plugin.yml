@@ -1,0 +1,22 @@
+name: SkriptProfiler
+version: ${project.version}
+main: com.macmoment.skriptprofiler.SkriptProfilerPlugin
+api-version: 1.20
+author: MacMoment
+description: ${project.description}
+depend: [Skript]
+
+commands:
+  skprofile:
+    description: Main command for Skript profiler
+    usage: /<command> [start|stop|report|reset|help]
+    aliases: [sp, skprof]
+    permission: skriptprofiler.use
+
+permissions:
+  skriptprofiler.use:
+    description: Allows usage of the profiler commands
+    default: op
+  skriptprofiler.admin:
+    description: Full access to profiler features
+    default: op

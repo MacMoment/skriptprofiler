@@ -1,0 +1,66 @@
+# SkriptProfiler Configuration
+
+# Profiling settings
+profiling:
+  # Automatically start profiling on server startup
+  auto-start: false
+  
+  # Sample interval in milliseconds (lower = more accurate but higher overhead)
+  sample-interval: 10
+  
+  # Maximum profiling duration in seconds (0 = unlimited)
+  max-duration: 300
+  
+  # Enable TPS-aware profiling (automatically adjusts sampling based on server TPS)
+  tps-aware: true
+  
+  # Minimum TPS threshold for warnings
+  tps-threshold: 18.0
+
+# Analysis thresholds
+thresholds:
+  # Execution time in milliseconds
+  slow-execution: 50
+  
+  # Very slow execution time in milliseconds
+  very-slow-execution: 200
+  
+  # Loop iterations before warning
+  loop-iterations: 1000
+  
+  # Wait/delay time in ticks
+  long-wait: 100
+  
+  # Variable access count per script
+  excessive-variables: 500
+
+# Reporting
+reporting:
+  # Show detailed line-by-line breakdown
+  detailed: true
+  
+  # Maximum number of issues to show per category
+  max-issues: 10
+  
+  # Include suggestions for optimization
+  include-suggestions: true
+  
+  # Report format (CONSOLE, IN_GAME, BOTH)
+  format: BOTH
+
+# Advanced settings
+advanced:
+  # Track individual event execution
+  track-events: true
+  
+  # Track function calls
+  track-functions: true
+  
+  # Track command execution
+  track-commands: true
+  
+  # Enable memory profiling
+  memory-profiling: false
+  
+  # Cache analyzed scripts
+  cache-analysis: true
