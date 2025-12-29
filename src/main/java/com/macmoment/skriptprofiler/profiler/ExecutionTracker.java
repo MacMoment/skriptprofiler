@@ -5,6 +5,7 @@ import com.macmoment.skriptprofiler.model.ProfileData;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.server.ServerEvent;
@@ -22,6 +23,7 @@ public class ExecutionTracker implements Listener {
     private final Map<String, ProfileData> profileDataMap;
     private final ThreadLocal<Long> executionStartTime;
     private volatile boolean isTracking;
+    private volatile boolean isRegistered;
     private long trackingStartTime;
     private long trackingEndTime;
     
@@ -30,6 +32,7 @@ public class ExecutionTracker implements Listener {
         this.profileDataMap = new ConcurrentHashMap<>();
         this.executionStartTime = new ThreadLocal<>();
         this.isTracking = false;
+        this.isRegistered = false;
     }
     
     /**
@@ -39,7 +42,10 @@ public class ExecutionTracker implements Listener {
         if (!isTracking) {
             isTracking = true;
             trackingStartTime = System.currentTimeMillis();
-            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            if (!isRegistered) {
+                plugin.getServer().getPluginManager().registerEvents(this, plugin);
+                isRegistered = true;
+            }
             plugin.getLogger().info("Execution tracking started");
         }
     }
@@ -51,7 +57,11 @@ public class ExecutionTracker implements Listener {
         if (isTracking) {
             isTracking = false;
             trackingEndTime = System.currentTimeMillis();
-            // Unregister is handled by Bukkit on plugin disable
+            // Unregister handlers to prevent memory leaks
+            if (isRegistered) {
+                HandlerList.unregisterAll(this);
+                isRegistered = false;
+            }
             plugin.getLogger().info("Execution tracking stopped");
         }
     }
@@ -118,12 +128,13 @@ public class ExecutionTracker implements Listener {
         String eventType = event.getClass().getSimpleName();
         long startTime = System.nanoTime();
         
-        // Simulate recording after event processing
+        // Record event execution after a tick to measure processing time
         // Real implementation would hook into Skript's trigger execution
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             long duration = System.nanoTime() - startTime;
-            // This is a simplified tracking mechanism
-            // Real implementation would require Skript API integration
+            // Record the event execution with basic tracking
+            ProfileData data = createOrGetProfileData("events", 0, "event", eventType);
+            data.recordExecution(duration);
         }, 1L);
     }
     

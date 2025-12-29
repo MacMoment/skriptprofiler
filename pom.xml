@@ -27,18 +27,14 @@
         </repository>
     </repositories>
 
-    <!-- Dependencies are provided by the server at runtime -->
-    <!-- Uncomment when building with dependencies available:
     <dependencies>
+        <!-- Spigot API - provided by the server at runtime -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
-    -->
-    <dependencies>
     </dependencies>
 
     <build>
