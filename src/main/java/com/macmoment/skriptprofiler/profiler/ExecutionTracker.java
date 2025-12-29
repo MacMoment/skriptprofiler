@@ -7,8 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.server.ServerEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -124,7 +122,6 @@ public class ExecutionTracker implements Listener {
      * To measure actual Skript execution time, integration with Skript's internal trigger
      * system would be required. This implementation tracks:
      * - Event occurrence count (useful for identifying high-frequency events)
-     * - Minimal profiler overhead timing (not the actual event processing time)
      * 
      * The script file analysis (via ScriptFileLoader) provides the main profiling data.
      */
@@ -134,14 +131,12 @@ public class ExecutionTracker implements Listener {
         
         String eventType = event.getClass().getSimpleName();
         
-        // Record the event occurrence - this tracks event frequency
-        // The timing recorded is the profiler's own overhead, not actual event processing
-        long startTime = System.nanoTime();
-        ProfileData data = createOrGetProfileData("events", 0, "event", eventType);
-        long endTime = System.nanoTime();
+        // Record the event occurrence - this primarily tracks event frequency
+        // Use "system:events" as scriptFile to distinguish from actual script files
+        ProfileData data = createOrGetProfileData("system:events", 0, "event", eventType);
         
-        // Record profiler overhead timing for this event occurrence
-        data.recordExecution(endTime - startTime);
+        // Increment execution count (timing is negligible for event counting purposes)
+        data.recordExecution(0);
     }
     
     /**
