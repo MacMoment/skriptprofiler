@@ -30,15 +30,25 @@ public class ProfileData {
         executionCount.incrementAndGet();
         totalExecutionTime.addAndGet(executionTimeNanos);
         
-        // Update min/max
-        synchronized (this) {
-            if (executionTimeNanos > maxExecutionTime) {
-                maxExecutionTime = executionTimeNanos;
-            }
-            if (executionTimeNanos < minExecutionTime) {
-                minExecutionTime = executionTimeNanos;
+        // Update min/max only for non-zero times
+        if (executionTimeNanos > 0) {
+            synchronized (this) {
+                if (executionTimeNanos > maxExecutionTime) {
+                    maxExecutionTime = executionTimeNanos;
+                }
+                if (executionTimeNanos < minExecutionTime) {
+                    minExecutionTime = executionTimeNanos;
+                }
             }
         }
+    }
+    
+    /**
+     * Increments the execution count without recording timing data.
+     * Useful for tracking event occurrences where timing cannot be measured.
+     */
+    public void incrementExecutionCount() {
+        executionCount.incrementAndGet();
     }
     
     public long getExecutionCount() {

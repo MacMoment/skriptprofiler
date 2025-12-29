@@ -135,8 +135,8 @@ public class ExecutionTracker implements Listener {
         // Use "system:events" as scriptFile to distinguish from actual script files
         ProfileData data = createOrGetProfileData("system:events", 0, "event", eventType);
         
-        // Increment execution count (timing is negligible for event counting purposes)
-        data.recordExecution(0);
+        // Increment execution count without timing data
+        data.incrementExecutionCount();
     }
     
     /**
